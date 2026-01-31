@@ -1,0 +1,34 @@
+import './TitlePage.css';
+import { Link } from 'react-router-dom';
+
+export default function TitlePage() {
+  return (
+      <main className='app-content'>
+        <div className='Main-text-container'>
+          <p className='Main-text'>We bring AI to</p>
+          <h1 className='Main-caps'>HEALTHCARE.</h1>
+          <p className='Text'>Instant, AI-powered symptom analysis to guide you toward the right diagnosis.</p>
+          <div className='symptom-analysis-button'>
+            <p className="symtom-analysis-text"><Link to="/symptom-analysis">Symptom analysis</Link></p>
+          </div>
+        </div>
+        <div className='Main-image-container'>
+          <img src="/img/dna.png" alt="DNA image" className='Main-image'/>
+          <div className="nav-links-overlay">
+            <Link to="/about" className="nav-about">
+            <span>About</span>
+            <span className="button-icon">+</span>
+            </Link>
+            <Link to="/database" className="nav-database">
+            <span>Database</span>
+            <span className="button-icon">+</span>
+            </Link>
+            <Link to="/contact" className="nav-contact">
+            <span>Contact</span>
+            <span className="button-icon">+</span>
+            </Link>
+          </div>
+        </div>
+      </main>
+  )
+}
