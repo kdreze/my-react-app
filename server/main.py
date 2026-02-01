@@ -1,3 +1,4 @@
+from datetime import datetime
 import numpy as np
 import json
 import os
@@ -52,7 +53,8 @@ class DiagnosisEntry(BaseModel):
     disease: str
     symptoms: list[int]
     note: str = "" # Pole do edycji (Update)
-
+    date: Optional[str] = None # Data diagnozy
+    confirmed: bool = False # Czy diagnoza została potwierdzona
 # --- LISTA SYMPTOMÓW ---
 SYMPTOMS = {
     0: "Fever", 1: "Cough", 2: "Fatigue", 3: "Headache", 4: "Nausea",
@@ -95,6 +97,8 @@ async def add_history(entry: DiagnosisEntry):
     db = load_db()
     new_entry = entry.dict()
     new_entry["id"] = str(uuid4()) # Generujemy unikalne ID
+    new_entry["date"] = datetime.now().strftime("%d-%m-%Y %H:%M")
+    new_entry["confirmed"] = False # Domyślnie niepotwierdzone
     db.append(new_entry)
     save_db(db)
     return new_entry
@@ -112,7 +116,10 @@ async def update_history(entry_id: str, payload: dict):
     for item in db:
         if item["id"] == entry_id:
             # Aktualizujemy notatkę, jeśli przyszła w żądaniu
-            item["note"] = payload.get("note", item["note"])
+            if "note" in payload:
+                item["note"] = payload["note"]
+            if "confirmed" in payload:
+                item["confirmed"] = payload["confirmed"]
             save_db(db)
             return item
     raise HTTPException(status_code=404, detail="Wpis nie znaleziony")
