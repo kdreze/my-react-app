@@ -23,7 +23,7 @@ export default function Header() {
         <span className='bar'></span>
         <span className='bar'></span>
       </div>
-      <div className='login_icon'>
+      <div className='login-icon'>
         <Link to="/login">
           <img src="img/login_icon.png" alt="Login icon" />
         </Link>

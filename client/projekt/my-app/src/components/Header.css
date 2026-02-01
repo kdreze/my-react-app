@@ -1,32 +1,29 @@
 .header {
-    width: 100%;
-    height: 120px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    position: absolute;
-    padding: 0 40px;
-    box-sizing: border-box;
-    z-index: 50;
-    background-color: transparent;
+     width: 100%;
+     height: 120px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     position: absolute;
+     padding: 0 40px;
+     box-sizing: border-box;
+     z-index: 50;
+     background-color: transparent;
 }
 
 .nav-list {
-    background-color: white;
-    padding: 15px 120px;
-    border-radius: 50px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    list-style: none;
-    display: flex;
-    gap: 120px;
-    margin: 0;
+     background-color: white;
+     padding: 15px 120px;
+     border-radius: 50px;
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+     list-style: none;
+     display: flex;
+     gap: 120px;
+     margin: 0;
+     visibility: hidden;
+     opacity: 0;
 
-    visibility: hidden;
-    opacity: 0;
-
-    transition: visibility 0.4s, opacity 0.4s ease;
+     transition: visibility 0.4s, opacity 0.4s ease;
 }
 
 .nav-list.active {
@@ -44,25 +41,50 @@
 
 .nav-logo {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 40px;
-    height: 180px;
-    width: auto;
-
+    top: 10%;
+    left: 10px;
+    height: 120px;
+    width: 140px;
     border-radius: 50%;
     z-index: 100;
+    cursor: pointer;
 }
 
+.nav-logo:hover {
+    transform: scale(1.05);
+}
+
+.login-icon {
+    position: absolute;
+    top: 20%;
+    right: 60px;
+    height: 50px;
+    width: auto;
+    z-index: 100;
+    cursor: pointer;
+    border-radius: 50%;    
+  
+}
+
+.login-icon:hover {
+    transform: scale(1.05);
+}
 
 .button {
+    background-color: transparent;;
     display: flex;
     flex-direction: column;
     cursor: pointer;
     gap: 5px;
     position: absolute;
-    right: 60px;
-    Z-index: 200;
+    right: 165px;
+    Z-index: 100;
+    top: 45%;
+    
+}
+
+.button:hover .bar {
+    transform: scale(1.05);
 }
 
 .bar {
@@ -70,8 +92,10 @@
     height: 3px;
     background-color: black;
     border-radius: 5px;
-    transition: all;
+    transition: all 0.3s ease;
+    top: -5%;
 }
+
 
 .nav-list-item a {
     text-decoration: none;
@@ -79,6 +103,8 @@
     display: block;
     width: 100%;
 }
+
+
 
 @media (max-width: 1200px) {
     .nav-list {
@@ -94,14 +120,14 @@
         right: -100%;
         width: 250px;
         height: 100vh;
-        background-color: white;
+        background-color: rgb(255, 255, 255);
         box-shadow: -5px 0 15px rgba(0,0,0,0.2);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 40px;
-        transition: right 0.4s ease-in-out;
+        transition: right 0.4   s ease-in-out;
         z-index: 150;
         border-radius: 0;
         margin: 0;

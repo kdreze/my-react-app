@@ -11,54 +11,58 @@ export default function LoginPanel() {
                     <button className="close-button">x</button>
                 </Link>
                 <div className="sign-in-container">
-                    <form>
-                        <h1 className="form-title">Sign in to Sympthosium</h1>
-                        <div className="input-group">
-                            <input type="email" placeholder="Email" />
-                        </div>
-                        <div className="input-group">
-                            <input type="password" placeholder="Password" />
-                        </div>
-                        <button className="primary-button">SIGN IN</button>
-                    </form>
+                    <div className="sign-in-form-wrapper">
+                        <form>
+                            <h1 className="form-title-left">Sign in to Sympthosium</h1>
+                            <div className="input-group-left">
+                                <input type="email" placeholder="Email" />
+                            </div>
+                            <div className="input-group-left">
+                                <input type="password" placeholder="Password" />
+                            </div>
+                            <button className="primary-button-left">SIGN IN</button>
+                        </form>
+                    </div>
                 </div>
                 <div className="sign-up-container">
-                    <form>
-                        <h1 className="form-title">Create an account</h1>
-                        <div className="input-group">
-                            <input type="text" placeholder="Name" />    
-                        </div>
-                        <div className="input-group">
-                            <input type="email" placeholder="Email" />
-                        </div>
-                        <div className="input-group">
-                            <input type="password" placeholder="Password" />
-                        </div>
-                        <div>
-                            <input type="password" placeholder="Repeat Password" />
-                        </div>
-                        <button className="primary-button">SIGN UP</button>
-                    </form>
+                    <div className="sign-up-form-wrapper">
+                        <form>
+                            <h1 className="form-title-right">Create an account</h1>
+                            <div className="input-group-right">
+                                <input type="text" placeholder="Name" />    
+                            </div>
+                            <div className="input-group-right">
+                                <input type="email" placeholder="Email" />
+                            </div>
+                            <div className="input-group-right">
+                                <input type="password" placeholder="Password" />
+                            </div>
+                            <div className="input-group-right">
+                                <input type="password" placeholder="Repeat password" />
+                            </div>
+                            <button className="primary-button-right">SIGN UP</button>
+                        </form>
+                    </div>
                 </div>
                 <div className="overlay-container">
                     <div className="overlay">
-                        <div className="overlay-panel overlay-left">
-                            <p className="overlay-small-text">Already have an account?</p>
+                        <div className="overlay-panel-left overlay-left">
+                            <p className="overlay-small-text-left">Already have an account?</p>
                             <h1>Welcome back!</h1>
-                            <p className="overlay-description">
+                            <p className="overlay-description-left">
                                 Access your tools, manage your contributions, and stay connected to the Sympthosium platform.
                             </p>
-                            <button className="secondary-button" onClick={() => setIsRightPanelActive(true)}>
+                            <button className="secondary-button-left" onClick={() => setIsRightPanelActive(false)}>
                                 SIGN IN
                             </button>
                         </div>
-                        <div className="overlay-panel overlay-right">
-                            <p className="overlay-small-text">New to Sympthosium?</p>
+                        <div className="overlay-panel-right overlay-right">
+                            <p className="overlay-small-text-right">New to Sympthosium?</p>
                             <h1>Register now!</h1>
-                            <p className="overlay-description">
+                            <p className="overlay-description-right">
                                 Join Sympthosium. Help improve our medical database and shape a smarter, more collaborative health platform.
                             </p>
-                            <button className="secondary-button" onClick={() => setIsRightPanelActive(false)}>
+                            <button className="secondary-button-right" onClick={() => setIsRightPanelActive(true)}>
                                 SIGN UP
                             </button>
                         </div>
