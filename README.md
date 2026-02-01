@@ -23,7 +23,6 @@ An intelligent web application that analyzes user-reported symptoms and provides
 - [Project Structure](#-project-structure)
 - [Technologies Used](#-technologies-used)
 - [Contributing](#-contributing)
-- [License](#-license)
 
 ---
 
@@ -46,11 +45,11 @@ An intelligent web application that analyzes user-reported symptoms and provides
 2. **Analyze** - Click the "DIAGNOSE" button
 3. **Get Results** - View potential diagnosis with detailed information and resources
 
-![Symptom Selection](docs/screenshot-selection.png)
-*Symptom selection interface*
+![Symptom Selection](/client/projekt/my-app/public/img/symptoms2.png)
+_Symptom selection interface_
 
-![Diagnosis Result](docs/screenshot-result.png)
-*Diagnosis result page*
+![Diagnosis Result](/client/projekt/my-app/public/img/diagnosis.png)
+_Diagnosis result page_
 
 ---
 
@@ -108,6 +107,7 @@ Real diseases don't present identically in every patient. Our dataset reflects t
 - **Medical Noise** (3-8% occurrence) - Rarely present atypical symptoms
 
 **Example - Influenza:**
+
 ```
 Patient A: Fever, Cough, Fatigue, Headache, Muscle Pain
 Patient B: Fever, Fatigue, Headache, Chills (no cough)
@@ -140,7 +140,7 @@ All three have influenza, but with different symptom combinations.
 
 ```bash
 # Navigate to backend directory
-cd backend
+cd server
 
 # Install Python dependencies
 pip install fastapi uvicorn scikit-learn pandas numpy
@@ -155,7 +155,7 @@ The backend will be available at `http://localhost:8000`
 
 ```bash
 # Navigate to frontend directory
-cd frontend
+cd client
 
 # Install dependencies
 npm install
@@ -170,16 +170,16 @@ The frontend will be available at `http://localhost:5173`
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sympthosium.git
+git clone https://github.com/kdreze/sympthosium.git
 cd sympthosium
 
 # Start backend (Terminal 1)
-cd backend
+cd server
 pip install -r requirements.txt
 python -m uvicorn main:app --reload --port 8000
 
 # Start frontend (Terminal 2)
-cd frontend
+cd client
 npm install
 npm run dev
 ```
@@ -201,14 +201,17 @@ npm run dev
 #### Endpoint: `POST /symptoms`
 
 **Request:**
+
 ```json
 {
   "symptoms": [1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, ...]
 }
 ```
-*Array of 45 binary values (0 or 1) representing absence/presence of each symptom*
+
+_Array of 45 binary values (0 or 1) representing absence/presence of each symptom_
 
 **Response:**
+
 ```json
 {
   "predicted_disease": "Influenza"
@@ -218,6 +221,7 @@ npm run dev
 #### Endpoint: `GET /all-symptoms`
 
 **Response:**
+
 ```json
 {
   "0": "Fever",
@@ -236,12 +240,11 @@ sympthosium/
 ├── backend/
 │   ├── main.py                 # FastAPI application & endpoints
 │   ├── model.py                # ML model training & loading
-│   ├── sympthosium_base.csv    # Original dataset (30 diseases)
 │   └── sympthosium_augmented.csv  # Augmented dataset (1,200 rows)
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
+│   │   ├── pages/
 │   │   │   ├── SymptomAnalysis.jsx      # Main symptom selection page
 │   │   │   └── DiagnosisResult.jsx      # Results display page
 │   │   ├── data/
@@ -258,19 +261,28 @@ sympthosium/
 ## 🛠️ Technologies Used
 
 ### Frontend
+
 - **React 18** - UI framework
 - **Vite** - Build tool and dev server
 - **React Router** - Client-side routing
 - **CSS3** - Styling
 
 ### Backend
+
 - **FastAPI** - Modern Python web framework
 - **uvicorn** - ASGI server
 - **scikit-learn** - Machine learning (Decision Tree Classifier)
 - **pandas** - Data manipulation
 - **numpy** - Numerical computing
 
+### Tools & Design
+
+- **Figma** - UI/UX Prototyping
+- **Git** - Version control
+- **Postman** - API testing
+
 ### Machine Learning
+
 - **Algorithm**: Decision Tree Classifier
 - **Training Data**: 1,200 symptom-disease pairs
 - **Features**: 45 binary symptom indicators
@@ -301,12 +313,14 @@ For production, update `allow_origins` to your deployed frontend URL.
 Create `.env` files for configuration:
 
 **Backend `.env`:**
+
 ```
 PORT=8000
 CORS_ORIGINS=http://localhost:5173
 ```
 
 **Frontend `.env`:**
+
 ```
 VITE_API_URL=http://localhost:8000
 ```
@@ -335,12 +349,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## ⚕️ Medical Disclaimer
 
 **IMPORTANT**: This application is designed for **educational and informational purposes only**. It is NOT intended to:
@@ -357,7 +365,10 @@ The machine learning model's predictions are based on statistical patterns and m
 
 ## 👥 Authors
 
-- **Your Name** - Initial work - [YourGitHub](https://github.com/yourusername)
+- **Anna Kowalska** - Frontend - [YourGitHub](https://github.com/aakowalska)
+- **Kacper Dreze** - Frontend - [YourGitHub](https://github.com/kdreze)
+- **Kacper Janczak** - Frontend - [YourGitHub](https://github.com/janczqk)
+- **Kuba Kryłowicz** - Backend - [YourGitHub](https://github.com/kkrylowicz)
 
 ---
 
@@ -371,7 +382,7 @@ The machine learning model's predictions are based on statistical patterns and m
 
 ## 📧 Contact
 
-Project Link: [https://github.com/yourusername/sympthosium](https://github.com/yourusername/sympthosium)
+Project Link: [https://github.com/kdreze/sympthosium](https://github.com/kdreze/sympthosium)
 
 ---
 
