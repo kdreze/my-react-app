@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import './History.css'; // <--- IMPORTUJEMY PLIK CSS
+import './History.css';
 
 const History = () => {
     const [history, setHistory] = useState([]);
     const [editId, setEditId] = useState(null);
     const [editNote, setEditNote] = useState("");
 
-    // 1. READ: Pobierz dane przy starcie
     useEffect(() => {
         fetchHistory();
     }, []);
@@ -17,29 +16,25 @@ const History = () => {
             const data = await res.json();
             setHistory(data.reverse());
         } catch (err) {
-            console.error("Błąd pobierania historii:", err);
+            console.error("Error fetching history:", err);
         }
     };
 
-    // 2. DELETE: Usuń wpis
     const handleDelete = async (id) => {
-        if(!window.confirm("Czy na pewno usunąć ten wpis?")) return;
-        
+        if(!window.confirm("Are you sure you want to delete this entry?")) return;
         try {
             await fetch(`http://localhost:8000/history/${id}`, { method: 'DELETE' });
-            fetchHistory(); // Odśwież listę po usunięciu
+            fetchHistory();
         } catch (err) {
-            console.error("Błąd usuwania:", err);
+            console.error("Deletion error:", err);
         }
     };
 
-    // 3. UPDATE: Rozpocznij edycję
     const startEdit = (item) => {
         setEditId(item.id);
         setEditNote(item.note);
     };
 
-    // 3. UPDATE: Zapisz edycję
     const saveEdit = async (id) => {
         try {
             await fetch(`http://localhost:8000/history/${id}`, {
@@ -48,57 +43,81 @@ const History = () => {
                 body: JSON.stringify({ note: editNote })
             });
             setEditId(null);
-            fetchHistory(); // Odśwież listę po zapisie
+            fetchHistory();
         } catch (err) {
-            console.error("Błąd edycji:", err);
+            console.error("Edition error:", err);
+        }
+    };
+
+    // NOWE: Funkcja do zmiany statusu checkboxa
+    const toggleConfirmed = async (item) => {
+        try {
+            await fetch(`http://localhost:8000/history/${item.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirmed: !item.confirmed })
+            });
+            fetchHistory();
+        } catch (err) {
+            console.error("Confirmation error:", err);
         }
     };
 
     return (
         <div className="history-container">
-            <h1 className="history-title">Historia Diagnoz</h1>
+            <h1 className="history-title">Diagnose history</h1>
             
             {history.length === 0 ? (
-                <p style={{ textAlign: 'center', fontSize: '1.2rem', marginTop: '20px' }}>
-                    Brak zapisanych diagnoz.
-                </p>
+                <p className="no-history-message">No saved diagnoses.</p>
             ) : (
                 <table className="history-table">
                     <thead>
                         <tr>
-                            <th style={{ width: '30%' }}>Zdiagnozowana Choroba</th>
-                            <th style={{ width: '40%' }}>Notatka Pacjenta</th>
-                            <th style={{ width: '30%' }}>Akcje</th>
+                            <th>DISEASE</th>
+                            <th className="text-center">DATE</th>
+                            <th className="text-center">CONFIRMED</th>
+                            <th>PATIENT NOTES</th>
+                            <th className="text-center">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
                         {history.map((item) => (
                             <tr key={item.id}>
-                                <td><strong>{item.disease}</strong></td>
+                                <td className="fw-bold">{item.disease}</td>
+                                <td className="text-center date-cell">{item.date || "-"}</td>
+                                <td className="text-center">
+                                    <input 
+                                        type="checkbox" 
+                                        className="confirm-checkbox"
+                                        checked={item.confirmed || false} 
+                                        onChange={() => toggleConfirmed(item)}
+                                    />
+                                </td>
                                 <td>
                                     {editId === item.id ? (
                                         <input 
                                             className="edit-input"
                                             value={editNote} 
                                             onChange={(e) => setEditNote(e.target.value)}
-                                            placeholder="Wpisz notatkę..." 
+                                            placeholder="Add note..." 
+                                            autoFocus
                                         />
                                     ) : (
-                                        item.note ? item.note : <span className="no-note">Brak notatki</span>
+                                        <span className="note-text">{item.note || "Add note..."}</span>
                                     )}
                                 </td>
-                                <td>
+                                <td className="action-cell">
                                     {editId === item.id ? (
                                         <button className="action-btn btn-save" onClick={() => saveEdit(item.id)}>
-                                            Zapisz
+                                            Save
                                         </button>
                                     ) : (
                                         <button className="action-btn btn-edit" onClick={() => startEdit(item)}>
-                                            Edytuj
+                                            Edit
                                         </button>
                                     )}
                                     <button className="action-btn btn-delete" onClick={() => handleDelete(item.id)}>
-                                        Usuń
+                                        Delete
                                     </button>
                                 </td>
                             </tr>
