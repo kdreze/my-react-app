@@ -36,27 +36,27 @@ export default function Database() {
         {
             icon: <img src="/img/respiratory.png" alt="Respiratory icon" />,
             title: "Respiratory",
-            description: "Influenza COVID-19 Pneumonia Asthma COPD"
+            diseases: ["Influenza", "COVID-19", "Pneumonia", "Asthma", "COPD"]
         },
         {
             icon: <img src="/img/cardio.png" alt="Cardiovascular icon" />,
             title: "Cardiovascular",
-            description: "Hypertension Heart Faileure Arrhythmia"
+            diseases: ["Hypertension", "Heart Failure", "Arrhythmia"]
         },
         {
             icon: <img src="/img/neuro.png" alt="Neurological icon" />,
             title: "Neurological",
-            description: "Migraine Stroke Alzheimer's Parkinson’s"
+            diseases: ["Migraine", "Stroke", "Alzheimer's", "Parkinson's"]
         },
         {
             icon: <img src="/img/metabolic.png" alt="Metabolic icon" />,
             title: "Metabolic",
-            description: "Type 1 & 2 Diabetes Hypothyroidism Hyperthyroidism"
+            diseases: ["Type 1 & 2 Diabetes", "Hypothyroidism", "Hyperthyroidism"]
         },
         {
             icon: <img src="/img/autoimmune.png" alt="Autoimmune icon" />,
             title: "Autoimmune",
-            description: "Rheumatoid ArthritisLupus Multiple Sclerosis"
+            diseases: ["Rheumatoid Arthritis", "Lupus", "Multiple Sclerosis"]
         }
     ];
     return (
@@ -121,7 +121,9 @@ export default function Database() {
                         </div>
                         <h3 className="box-title">{box.title}</h3>
                         <div className="box-description">
-                            {box.description}
+                            {box.diseases.map((disease, idx) => (
+                                <p key={idx} className="disease-item">{disease}</p>
+                            ))}
                         </div>
                     </div>
                     ))}

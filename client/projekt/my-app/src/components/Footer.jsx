@@ -22,7 +22,7 @@ export default function Footer() {
           </li>
           <li className="footer-email">
             <img src="/img/foot-mail.png" alt="Email" />
-            <span>sympthosium@sympthosium.pl</span>
+            <span>sympthosium@gmail.com</span>
           </li>
        </ul>
       </div>

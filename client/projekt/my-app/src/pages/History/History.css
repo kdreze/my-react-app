@@ -19,7 +19,7 @@
     border-collapse: separate; /* Ważne dla border-radius */
     border-spacing: 0;
     background-color: #fff;
-    border-radius: 15px; /* Zaokrąglenie całej tabeli */
+    border-radius: 25px; /* Zaokrąglenie całej tabeli */
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     border: 1px solid #8ecae6; /* Jasna ramka */
@@ -27,7 +27,7 @@
 
 /* Nagłówek tabeli - Niebieski */
 .history-table thead tr {
-    background-color: #87CEEB; /* Błękitny kolor jak na zdjęciu */
+    background: linear-gradient(#FFFFFF 0%, #5E8AA5 91%);;
 }
 
 .history-table th {
@@ -67,7 +67,7 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
-    accent-color: #007bff;
+    accent-color: #4886c9;
 }
 
 /* Input edycji */
@@ -75,7 +75,7 @@
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 15px;
 }
 
 .note-text {
@@ -104,6 +104,7 @@
 
 .btn-edit:hover {
     background-color: #f0f0f0;
+    transform: translate3d(0px, -3px, 0px);
 }
 
 .btn-save {
@@ -114,6 +115,7 @@
 
 .btn-save:hover {
     background-color: #5fb8e0;
+    transform: translate3d(0px, -3px, 0px);
 }
 
 .btn-delete {
@@ -124,6 +126,7 @@
 
 .btn-delete:hover {
     background-color: #5a7080;
+    transform: translate3d(0px, -3px, 0px);
 }
 
 /* Ostatni wiersz bez linii na dole */
