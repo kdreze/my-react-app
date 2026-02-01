@@ -26,8 +26,8 @@ export default function Contact() {
     return (
         <main className="contact-content">
             <div className="contact-card">
-                <div className="deco-quotes">'''</div>
                 <div className="contact-page-container">
+                    <img className='Rectangle' src="/img/Rectangle 54.png" alt="Decorative rectangle"/>
                     <div className="contact-page-text">
                         <h1 className="contact-subtitle">
                             <span>We would love to <br/> hear from <br/> you!</span>

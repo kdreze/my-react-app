@@ -135,7 +135,7 @@ export default function SymptomAnalysis() {
             <li className="symptoms-page-step">
               Check off any symptoms that apply to what you are feeling.
             </li>
-            <li className="symptoms-page-step">Press the DIAGNOSE button.</li>
+            <li className="symptoms-page-step">Press the <b>DIAGNOSE</b> button.</li>
             <li className="symptoms-page-step">
               Get insights about what you are experiencing.
             </li>
