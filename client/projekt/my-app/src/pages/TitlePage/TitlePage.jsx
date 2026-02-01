@@ -27,6 +27,10 @@ export default function TitlePage() {
             <span>Contact</span>
             <span className="button-icon">+</span>
             </Link>
+            <Link to="/history" className="nav-history">
+            <span>History</span>
+            <span className="button-icon">+</span>
+            </Link>
           </div>
         </div>
       </main>

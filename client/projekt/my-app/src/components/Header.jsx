@@ -33,6 +33,7 @@ export default function Header() {
           <li className="nav-list-item"><Link to="/about" onClick={closeMobileMenu}>About</Link></li>
           <li className="nav-list-item"><Link to="/database" onClick={closeMobileMenu}>Database</Link></li>
           <li className="nav-list-item"><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
+          <li className="nav-list-item"><Link to="/history" onClick={closeMobileMenu}>History</Link></li>     
         </ul>
       </nav>
     </header>

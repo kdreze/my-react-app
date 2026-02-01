@@ -10,7 +10,7 @@ import Database from './pages/Database/Database.jsx'
 import Contact from './pages/Contact/Contact.jsx'
 import SymptomAnalysis from './pages/SymptomAnalysis/SymptomAnalysis.jsx'
 import LoginPanel from './pages/LoginPanel/LoginPanel.jsx'
-
+import History from './pages/History/History.jsx';
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/symptom-analysis" element={<SymptomAnalysis />} />
             <Route path="/login" element={<LoginPanel />} />
+            <Route path="/history" element={<History />} />
           </Routes>
         </main> 
         <Footer />

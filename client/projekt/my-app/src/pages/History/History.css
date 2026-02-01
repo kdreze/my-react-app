@@ -1,0 +1,137 @@
+/* src/pages/History/History.css */
+
+.history-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 120px 20px 50px; /* Margines górny na Navbar */
+    font-family: 'Arial', sans-serif;
+}
+
+.history-title {
+    text-align: center;
+    /* Zmiana koloru tytułu na ciemnoniebieski, żeby pasował do tła */
+    color: #004a99;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* --- STYLIZACJA TABELI (EFEKT SZKŁA) --- */
+.history-table {
+    width: 100%;
+    border-collapse: separate; /* Ważne dla zaokrąglonych rogów przy border-radius */
+    border-spacing: 0;
+    
+    /* KLUCZOWE ZMIANY DLA WTAPIANIA SIĘ W TŁO: */
+    /* 1. Półprzezroczyste białe tło (55% widoczności) */
+    background-color: rgba(255, 255, 255, 0.55);
+    /* 2. Rozmycie tła pod spodem (efekt mlecznego szkła) */
+    backdrop-filter: blur(12px);
+    /* 3. Subtelna, półprzezroczysta ramka */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* 4. Bardziej miękki cień */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    border-radius: 12px; /* Bardziej zaokrąglone rogi */
+    overflow: hidden;
+}
+
+.history-table th,
+.history-table td {
+    padding: 18px 15px;
+    text-align: left;
+    /* Delikatniejsze linie oddzielające wiersze */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.history-table th {
+    /* Nagłówek też lekko przezroczysty niebieski */
+    background-color: rgba(0, 123, 255, 0.85);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none; /* Usuwa linię pod ostatnim wierszem */
+}
+
+.history-table tr:hover {
+    /* Przy najechaniu wiersz staje się "bardziej biały" (mniej przezroczysty) */
+    background-color: rgba(255, 255, 255, 0.4);
+    transition: background-color 0.3s ease;
+}
+/* --- ELEMENTY EDYCJI --- */
+.edit-input {
+    width: 90%;
+    padding: 8px 12px;
+    /* Półprzezroczyste tło dla inputa */
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.no-note {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- PRZYCISKI (STYL SZKLANY / BŁĘKITNY) --- */
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px; /* Bardziej zaokrąglone - pastylki */
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+    
+    /* Wspólny efekt szkła dla przycisków */
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Przycisk EDYTUJ - Biały/Szklany */
+.btn-edit {
+    background-color: rgba(255, 255, 255, 0.7); 
+    color: #0056b3; /* Ciemnoniebieski tekst */
+}
+
+.btn-edit:hover {
+    background-color: #ffffff; /* Pełna biel po najechaniu */
+    color: #003d80;
+    transform: translateY(-2px); /* Lekkie uniesienie */
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
+}
+
+/* Przycisk ZAPISZ - Jasny Błękit */
+.btn-save {
+    background-color: rgba(0, 123, 255, 0.8);
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+/* Przycisk USUŃ - Ciemny Granat (zamiast czerwonego) */
+.btn-delete {
+    background-color: rgba(12, 46, 92, 0.7); /* Ciemny, elegancki granat */
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-delete:hover {
+    background-color: #0a254a; /* Jeszcze ciemniejszy po najechaniu */
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 37, 74, 0.5);
+}

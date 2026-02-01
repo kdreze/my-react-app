@@ -3,58 +3,46 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import DiagnosisResult from "../DiagnosisResult/DiagnosisResult";
 import database from "../../data/data.json";
+// 1. IMPORTUJEMY KOMPONENT HISTORII
+// (Upewnij się, że plik History.jsx jest w tym samym folderze co SymptomAnalysis.jsx) 
 
 const symptomsList = [
-  "Fever",
-  "Cough",
-  "Fatigue",
-  "Headache",
-  "Nausea",
-  "Vomiting",
-  "Diarrhea",
-  "Abdominal pain",
-  "Chest pain",
-  "Shortness of breath",
-  "Dizziness",
-  "Rash",
-  "Joint pain",
-  "Muscle Pain",
-  "Swelling",
-  "Weight loss",
-  "Weight gain",
-  "Night sweats",
-  "Chills",
-  "Sore throat",
-  "Runny nose",
-  "Sneezing",
-  "Loss of appetite",
-  "Vision problems",
-  "Confusion",
-  "Seizures",
-  "Paralysis",
-  "Numbness",
-  "Tingling",
-  "Increased thirst",
-  "Increased urination",
-  "Hair loss",
-  "Jaundice",
-  "Itching",
-  "Heart palpitations",
-  "Anxiety",
-  "Heat intolerance",
-  "Cold intolerance",
-  "Balance issues",
-  "Memory loss",
-  "Difficulty swallowing",
-  "Anosmia (loss of smell)",
-  "Wheezing",
-  "Neck stiffness",
-  "Dark urine",
+  "Fever", "Cough", "Fatigue", "Headache", "Nausea", "Vomiting", "Diarrhea",
+  "Abdominal pain", "Chest pain", "Shortness of breath", "Dizziness", "Rash",
+  "Joint pain", "Muscle Pain", "Swelling", "Weight loss", "Weight gain",
+  "Night sweats", "Chills", "Sore throat", "Runny nose", "Sneezing",
+  "Loss of appetite", "Vision problems", "Confusion", "Seizures", "Paralysis",
+  "Numbness", "Tingling", "Increased thirst", "Increased urination",
+  "Hair loss", "Jaundice", "Itching", "Heart palpitations", "Anxiety",
+  "Heat intolerance", "Cold intolerance", "Balance issues", "Memory loss",
+  "Difficulty swallowing", "Anosmia (loss of smell)", "Wheezing",
+  "Neck stiffness", "Dark urine",
 ];
+
 export default function SymptomAnalysis() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSymptoms, setSelectedSymptoms] = useState({});
   const [diagnosisData, setDiagnosisData] = useState(null);
+
+  // --- NOWA FUNKCJA: ZAPIS DO HISTORII (CREATE) ---
+  const saveToHistory = async (disease, symptomsArray) => {
+    try {
+      await fetch("http://localhost:8000/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          disease: disease,
+          symptoms: symptomsArray,
+          note: "Nowa diagnoza", // Domyślna notatka
+        }),
+      });
+      // Nie musimy tu nic wyświetlać, bo i tak zmienimy widok,
+      // a historia odświeży się sama przy następnym załadowaniu.
+    } catch (error) {
+      console.error("Błąd zapisu do historii:", error);
+    }
+  };
+
   const handleCheckboxChange = (symptom) => {
     setSelectedSymptoms((prev) => ({
       ...prev,
@@ -64,51 +52,55 @@ export default function SymptomAnalysis() {
 
   const handleDiagnose = async () => {
     const count = Object.values(selectedSymptoms).filter(
-      (val) => val === true,
+      (val) => val === true
     ).length;
+    
     if (count < 4) {
       alert("Please select at least 4 symptoms to proceed with diagnosis.");
       return;
     }
 
-    // Tworzenie tablicy 0 i 1
     const numbersArray = symptomsList.map((symptom) =>
-      selectedSymptoms[symptom] ? 1 : 0,
+      selectedSymptoms[symptom] ? 1 : 0
     );
 
     try {
-      // WYSŁANIE REQUESTU DO BACKENDU
       const response = await fetch("http://localhost:8000/symptoms", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symptoms: numbersArray }),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      if (!response.ok) throw new Error("Network response was not ok");
 
       const data = await response.json();
       const backendPrediction = data.predicted_disease;
 
-      // Wyszukiwanie w lokalnej bazie danych
+      // --- ZMIANA 1: USUNĘLIŚMY POPUP (window.confirm) ---
+      // Nie pytamy tutaj o zapis. Robimy to w DiagnosisResult.
+
+      // Szukanie w pliku JSON
       const foundDisease = database.find(
         (item) =>
           item.Disease?.trim().toLowerCase() ===
-          backendPrediction?.trim().toLowerCase(),
+          backendPrediction?.trim().toLowerCase()
       );
 
-      if (foundDisease) {
-        setDiagnosisData(foundDisease);
-      } else {
-        setDiagnosisData({
+      // --- ZMIANA 2: DOKLEJAMY DANE DO WYNIKU ---
+      // Musimy przekazać backendPrediction i numbersArray do dziecka,
+      // żeby wiedziało CO zapisać, gdy użytkownik kliknie przycisk.
+      const resultData = foundDisease ? { ...foundDisease } : {
           Disease: backendPrediction || "Unknown",
           Description: "No matching disease found in the database.",
           Symptoms: "N/A",
-        });
-      }
+      };
+
+      // Dodajemy surowe dane dla backendu
+      resultData.rawPrediction = backendPrediction;
+      resultData.rawSymptoms = numbersArray;
+
+      setDiagnosisData(resultData);
+
     } catch (error) {
       console.error("Error diagnosing:", error);
       alert("Failed to get diagnosis. Please try again.");
@@ -120,9 +112,17 @@ export default function SymptomAnalysis() {
     setSelectedSymptoms({});
     setIsOpen(false);
   };
+
   if (diagnosisData) {
-    return <DiagnosisResult data={diagnosisData} onBack={closeDiagnosis} />;
+    return (
+      <DiagnosisResult 
+        data={diagnosisData} 
+        onBack={closeDiagnosis} 
+        onSave={saveToHistory} // <-- Przekazujemy funkcję zapisu
+      />
+    );
   }
+
   return (
     <main className="symptoms-page">
       <div className="symptoms-page-container">
