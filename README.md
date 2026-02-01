@@ -365,10 +365,10 @@ The machine learning model's predictions are based on statistical patterns and m
 
 ## 👥 Authors
 
-- **Anna Kowalska** - Frontend - [YourGitHub](https://github.com/aakowalska)
-- **Kacper Dreze** - Frontend - [YourGitHub](https://github.com/kdreze)
-- **Kacper Janczak** - Frontend - [YourGitHub](https://github.com/janczqk)
-- **Kuba Kryłowicz** - Backend - [YourGitHub](https://github.com/kkrylowicz)
+- **Anna Kowalska** - Frontend - [aakowalska](https://github.com/aakowalska)
+- **Kacper Dreze** - Frontend - [kdreze](https://github.com/kdreze)
+- **Kacper Janczak** - Frontend - [janczqk](https://github.com/janczqk)
+- **Kuba Kryłowicz** - Backend - [kkrylowicz](https://github.com/kkrylowicz)
 
 ---
 
