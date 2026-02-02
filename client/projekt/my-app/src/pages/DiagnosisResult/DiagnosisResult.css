@@ -42,8 +42,8 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    z-index: 100; /* Ważne: żeby był "nad" wszystkim innym */
-    user-select: none; /* Żeby nie zaznaczać tekstu przy klikaniu */
+    z-index: 100;
+    user-select: none;
 }
 
 .close-btn-x:hover {
