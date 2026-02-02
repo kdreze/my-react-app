@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import './History.css';
+import { useAuth } from '../../context/AuthContext';
 
 const History = () => {
     const [history, setHistory] = useState([]);
     const [editId, setEditId] = useState(null);
     const [editNote, setEditNote] = useState("");
+    const { token } = useAuth();
 
     useEffect(() => {
         fetchHistory();
@@ -12,9 +14,13 @@ const History = () => {
 
     const fetchHistory = async () => {
         try {
-            const res = await fetch('http://localhost:8000/history');
+            const res = await fetch('http://localhost:8000/history', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await res.json();
-            setHistory(data.reverse());
+            setHistory(data);
         } catch (err) {
             console.error("Error fetching history:", err);
         }
@@ -23,7 +29,12 @@ const History = () => {
     const handleDelete = async (id) => {
         if(!window.confirm("Are you sure you want to delete this entry?")) return;
         try {
-            await fetch(`http://localhost:8000/history/${id}`, { method: 'DELETE' });
+            await fetch(`http://localhost:8000/history/${id}`, { 
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             fetchHistory();
         } catch (err) {
             console.error("Deletion error:", err);
@@ -39,7 +50,10 @@ const History = () => {
         try {
             await fetch(`http://localhost:8000/history/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ note: editNote })
             });
             setEditId(null);
@@ -49,12 +63,14 @@ const History = () => {
         }
     };
 
-    // NOWE: Funkcja do zmiany statusu checkboxa
     const toggleConfirmed = async (item) => {
         try {
             await fetch(`http://localhost:8000/history/${item.id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ confirmed: !item.confirmed })
             });
             fetchHistory();

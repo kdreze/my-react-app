@@ -1,61 +1,60 @@
 from datetime import datetime
 import numpy as np
 import json
-import os
 from uuid import uuid4
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException
+from typing import Optional
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-# Upewnij się, że plik model.py i model.pkl są w tym samym folderze
-from model import model 
+from pydantic import BaseModel, EmailStr
+from model import model
+from database import get_db
+from auth import (
+    get_password_hash, 
+    verify_password, 
+    create_access_token,
+    get_current_user
+)
 
 app = FastAPI()
 
-# --- KONFIGURACJA CORS ---
-# Zmieniamy na ["*"], żeby działało na każdym porcie (5173, 5174 itp.)
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- BAZA DANYCH (Plik JSON) ---
-DB_FILE = "db.json"
+# ==================== MODELE DANYCH ====================
 
-# Funkcja pomocnicza: Odczyt z bazy
-def load_db():
-    if not os.path.exists(DB_FILE):
-        # Jeśli plik nie istnieje, zwracamy pustą listę
-        return []
-    with open(DB_FILE, "r") as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError:
-            return []
+class UserRegister(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
 
-# Funkcja pomocnicza: Zapis do bazy
-def save_db(data):
-    with open(DB_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
-# --- MODELE DANYCH (Pydantic) ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: dict
 
-# Model do predykcji (to co wysyła frontend przy diagnozie)
 class Payload(BaseModel):
     symptoms: list[int]
 
-# Model do zapisu w historii (CRUD)
 class DiagnosisEntry(BaseModel):
     id: Optional[str] = None
     disease: str
     symptoms: list[int]
-    note: str = "" # Pole do edycji (Update)
-    date: Optional[str] = None # Data diagnozy
-    confirmed: bool = False # Czy diagnoza została potwierdzona
-# --- LISTA SYMPTOMÓW ---
+    note: str = ""
+    date: Optional[str] = None
+    confirmed: bool = False
+
+# ==================== LISTA SYMPTOMÓW ====================
+
 SYMPTOMS = {
     0: "Fever", 1: "Cough", 2: "Fatigue", 3: "Headache", 4: "Nausea",
     5: "Vomiting", 6: "Diarrhea", 7: "Abdominal Pain", 8: "Chest Pain",
@@ -75,64 +74,239 @@ SYMPTOMS = {
 async def all_symptoms():
     return SYMPTOMS
 
-# --- LOGIKA ML (Twoja stara funkcja) ---
-# Zostawiłem nazwę "/symptoms", żeby stary kod Frontendu działał bez zmian
+# ==================== AUTHENTICATION ENDPOINTS ====================
+
+@app.post("/register", response_model=Token)
+async def register(user: UserRegister):
+    """Rejestracja nowego użytkownika"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Sprawdź czy email już istnieje
+        cursor.execute("SELECT id FROM users WHERE email = ?", (user.email,))
+        if cursor.fetchone():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        
+        # Hashuj hasło i zapisz użytkownika
+        hashed_password = get_password_hash(user.password)
+        cursor.execute(
+            "INSERT INTO users (name, email, hashed_password) VALUES (?, ?, ?)",
+            (user.name, user.email, hashed_password)
+        )
+        user_id = cursor.lastrowid
+        
+        # Utwórz token
+        access_token = create_access_token(data={"sub": str(user_id), "email": user.email})
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "name": user.name,
+                "email": user.email
+            }
+        }
+
+@app.post("/login", response_model=Token)
+async def login(credentials: UserLogin):
+    """Logowanie użytkownika"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Znajdź użytkownika
+        cursor.execute(
+            "SELECT id, name, email, hashed_password FROM users WHERE email = ?",
+            (credentials.email,)
+        )
+        user = cursor.fetchone()
+        
+        if not user or not verify_password(credentials.password, user["hashed_password"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password"
+            )
+        
+        # Utwórz token
+        access_token = create_access_token(data={"sub": str(user["id"]), "email": user["email"]})
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user["id"],
+                "name": user["name"],
+                "email": user["email"]
+            }
+        }
+
+@app.get("/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Zwraca dane zalogowanego użytkownika"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, email FROM users WHERE id = ?",
+            (current_user["user_id"],)
+        )
+        user = cursor.fetchone()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"]
+        }
+
+# ==================== ML PREDICTION (Public - no auth required) ====================
+
 @app.post("/symptoms")
 async def symptoms(payload: Payload):
+    """Predykcja choroby na podstawie symptomów - dostępne bez logowania"""
     inp = np.array(payload.symptoms).reshape(1, -1)
     prediction = model.predict(inp)
-
+    
     disease_name = (
         prediction[0] if isinstance(prediction[0], str) else str(prediction[0])
     )
-
+    
     return {"predicted_disease": disease_name}
 
+# ==================== HISTORY CRUD (Protected - requires auth) ====================
 
-# --- NOWOŚĆ: CRUD OPERATIONS (Wymagane do zaliczenia) ---
-
-# 1. CREATE (Dodaj nową diagnozę do historii)
 @app.post("/history")
-async def add_history(entry: DiagnosisEntry):
-    db = load_db()
-    new_entry = entry.dict()
-    new_entry["id"] = str(uuid4()) # Generujemy unikalne ID
-    new_entry["date"] = datetime.now().strftime("%d-%m-%Y %H:%M")
-    new_entry["confirmed"] = False # Domyślnie niepotwierdzone
-    db.append(new_entry)
-    save_db(db)
-    return new_entry
-
-# 2. READ (Wyświetl listę diagnoz)
-@app.get("/history")
-async def get_history():
-    return load_db()
-
-# 3. UPDATE (Edytuj notatkę w diagnozie)
-@app.put("/history/{entry_id}")
-async def update_history(entry_id: str, payload: dict):
-    # Frontend wyśle np: {"note": "Pacjent zdrowy"}
-    db = load_db()
-    for item in db:
-        if item["id"] == entry_id:
-            # Aktualizujemy notatkę, jeśli przyszła w żądaniu
-            if "note" in payload:
-                item["note"] = payload["note"]
-            if "confirmed" in payload:
-                item["confirmed"] = payload["confirmed"]
-            save_db(db)
-            return item
-    raise HTTPException(status_code=404, detail="Wpis nie znaleziony")
-
-# 4. DELETE (Usuń wpis z historii)
-@app.delete("/history/{entry_id}")
-async def delete_history(entry_id: str):
-    db = load_db()
-    # Zostaw tylko te elementy, które NIE mają podanego ID
-    new_db = [item for item in db if item["id"] != entry_id]
-    
-    if len(db) == len(new_db):
-        raise HTTPException(status_code=404, detail="Wpis nie znaleziony")
+async def add_history(
+    entry: DiagnosisEntry,
+    current_user: dict = Depends(get_current_user)
+):
+    """Dodaj diagnozę do historii zalogowanego użytkownika"""
+    with get_db() as conn:
+        cursor = conn.cursor()
         
-    save_db(new_db)
-    return {"message": "Usunięto pomyślnie"}
+        entry_id = str(uuid4())
+        date = datetime.now().strftime("%d-%m-%Y %H:%M")
+        
+        cursor.execute("""
+            INSERT INTO diagnoses (id, user_id, disease, symptoms, note, date, confirmed)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            entry_id,
+            current_user["user_id"],
+            entry.disease,
+            json.dumps(entry.symptoms),
+            entry.note,
+            date,
+            0
+        ))
+        
+        return {
+            "id": entry_id,
+            "disease": entry.disease,
+            "symptoms": entry.symptoms,
+            "note": entry.note,
+            "date": date,
+            "confirmed": False
+        }
+
+@app.get("/history")
+async def get_history(current_user: dict = Depends(get_current_user)):
+    """Pobierz historię diagnoz zalogowanego użytkownika"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT id, disease, symptoms, note, date, confirmed
+            FROM diagnoses
+            WHERE user_id = ?
+            ORDER BY date DESC
+        """, (current_user["user_id"],))
+        
+        rows = cursor.fetchall()
+        
+        result = []
+        for row in rows:
+            result.append({
+                "id": row["id"],
+                "disease": row["disease"],
+                "symptoms": json.loads(row["symptoms"]),
+                "note": row["note"],
+                "date": row["date"],
+                "confirmed": bool(row["confirmed"])
+            })
+        
+        return result
+
+@app.put("/history/{entry_id}")
+async def update_history(
+    entry_id: str,
+    payload: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Edytuj diagnozę (tylko własne)"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Sprawdź czy diagnoza należy do użytkownika
+        cursor.execute(
+            "SELECT id FROM diagnoses WHERE id = ? AND user_id = ?",
+            (entry_id, current_user["user_id"])
+        )
+        
+        if not cursor.fetchone():
+            raise HTTPException(status_code=404, detail="Entry not found or unauthorized")
+        
+        # Aktualizuj
+        if "note" in payload:
+            cursor.execute(
+                "UPDATE diagnoses SET note = ? WHERE id = ?",
+                (payload["note"], entry_id)
+            )
+        
+        if "confirmed" in payload:
+            cursor.execute(
+                "UPDATE diagnoses SET confirmed = ? WHERE id = ?",
+                (1 if payload["confirmed"] else 0, entry_id)
+            )
+        
+        # Pobierz zaktualizowane dane
+        cursor.execute(
+            "SELECT id, disease, symptoms, note, date, confirmed FROM diagnoses WHERE id = ?",
+            (entry_id,)
+        )
+        row = cursor.fetchone()
+        
+        return {
+            "id": row["id"],
+            "disease": row["disease"],
+            "symptoms": json.loads(row["symptoms"]),
+            "note": row["note"],
+            "date": row["date"],
+            "confirmed": bool(row["confirmed"])
+        }
+
+@app.delete("/history/{entry_id}")
+async def delete_history(
+    entry_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Usuń diagnozę (tylko własne)"""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Sprawdź czy diagnoza należy do użytkownika
+        cursor.execute(
+            "SELECT id FROM diagnoses WHERE id = ? AND user_id = ?",
+            (entry_id, current_user["user_id"])
+        )
+        
+        if not cursor.fetchone():
+            raise HTTPException(status_code=404, detail="Entry not found or unauthorized")
+        
+        cursor.execute("DELETE FROM diagnoses WHERE id = ?", (entry_id,))
+        
+        return {"message": "Deleted successfully"}

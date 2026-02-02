@@ -1,17 +1,28 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
-  }
+  };
+
   const closeMobileMenu = () => {
     if (window.innerWidth <= 768) {
       setIsNavOpen(false);
     }
-  }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    closeMobileMenu();
+  };
 
   return (
     <header className="header">
@@ -23,11 +34,30 @@ export default function Header() {
         <span className='bar'></span>
         <span className='bar'></span>
       </div>
-      <div className='login-icon'>
-        <Link to="/login">
-          <img src="img/login_icon.png" alt="Login icon" />
-        </Link>
+      
+      {/* User Panel Section */}
+      <div className='user-panel-container'>
+        {isAuthenticated ? (
+          <div className="user-panel">
+            <div className="user-avatar">
+              <img src="img/login_icon.png" alt="User avatar" />
+            </div>
+            <div className="user-info">
+              <span className="user-greeting">Hello,</span>
+              <span className="user-name-display">{user?.name}</span>
+            </div>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          </div>
+        ) : (
+          <Link to="/login" className="login-button">
+            <img src="img/login_icon.png" alt="Login icon" />
+            <span>Login</span>
+          </Link>
+        )}
       </div>
+
       <nav>
         <ul className={`nav-list ${isNavOpen ? "active" : ""}`}>
           <li className="nav-list-item"><Link to="/about" onClick={closeMobileMenu}>About</Link></li>
@@ -37,5 +67,5 @@ export default function Header() {
         </ul>
       </nav>
     </header>
-  )
+  );
 }

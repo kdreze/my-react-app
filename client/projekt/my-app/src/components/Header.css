@@ -54,33 +54,142 @@
     transform: scale(1.05);
 }
 
-.login-icon {
+/* ========================================
+   USER PANEL CONTAINER
+   ======================================== */
+.user-panel-container {
     position: absolute;
-    top: 20%;
-    right: 60px;
-    height: 50px;
-    width: auto;
+    top: 15%;
+    right: 40px;
     z-index: 100;
-    cursor: pointer;
-    border-radius: 50%;    
-  
 }
 
-.login-icon:hover {
+/* ========================================
+   LOGIN BUTTON (when not logged in)
+   ======================================== */
+.login-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #E8F4F8 100%);
+    border: 2px solid #7bbbe4;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(123, 187, 228, 0.3);
+    background: linear-gradient(135deg, #E8F4F8 0%, #FFFFFF 100%);
+}
+
+.login-button img {
+    height: 30px;
+    width: auto;
+}
+
+.login-button span {
+    white-space: nowrap;
+}
+
+/* ========================================
+   USER PANEL (when logged in)
+   ======================================== */
+.user-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #E8F4F8 100%);
+    border: 2px solid #7bbbe4;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    min-width: 150px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #7bbbe4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.user-avatar img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.user-greeting {
+    font-size: 12px;
+    color: #666;
+    font-weight: normal;
+}
+
+.user-name-display {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logout-button {
+    width: 100%;
+    padding: 8px 16px;
+    background: #7bbbe4;
+    border: 2px solid #000;
+    border-radius: 20px;
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.logout-button:hover {
+    background: #4a92bf;
     transform: scale(1.05);
 }
 
+/* ========================================
+   HAMBURGER BUTTON
+   ======================================== */
 .button {
-    background-color: transparent;;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     cursor: pointer;
     gap: 5px;
     position: absolute;
-    right: 165px;
-    Z-index: 100;
+    right: 240px;
+    z-index: 100;
     top: 45%;
-    
 }
 
 .button:hover .bar {
@@ -96,7 +205,6 @@
     top: -5%;
 }
 
-
 .nav-list-item a {
     text-decoration: none;
     color: black;
@@ -104,15 +212,42 @@
     width: 100%;
 }
 
-
-
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
 @media (max-width: 1200px) {
     .nav-list {
         gap: 30px;
         padding: 20px 40px;
     }
+    
+    .user-panel {
+        padding: 12px 15px;
+        min-width: 130px;
+    }
+    
+    .user-name-display {
+        font-size: 14px;
+        max-width: 100px;
+    }
+    
+    .login-button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .login-button img {
+        height: 25px;
+    }
+    
+    .button {
+        right: 200px;
+    }
 }
 
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
 @media (max-width: 768px) {
     .nav-list {
         position: fixed;
@@ -127,7 +262,7 @@
         align-items: center;
         justify-content: center;
         gap: 40px;
-        transition: right 0.4   s ease-in-out;
+        transition: right 0.4s ease-in-out;
         z-index: 150;
         border-radius: 0;
         margin: 0;
@@ -138,5 +273,72 @@
 
     .nav-list.active {
         right: 0;
+    }
+    
+    /* Compact user panel on mobile */
+    .user-panel {
+        padding: 10px 12px;
+        min-width: 110px;
+        gap: 6px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #7bbbe4;
+    }
+    
+    .user-avatar img {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .user-greeting {
+        font-size: 10px;
+    }
+    
+    .user-name-display {
+        font-size: 13px;
+        max-width: 80px;
+    }
+    
+    .logout-button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .login-button {
+        padding: 8px 12px;
+        font-size: 13px;
+        gap: 6px;
+    }
+    
+    .login-button img {
+        height: 22px;
+    }
+    
+    .login-button span {
+        display: none; /* Hide "Login" text on very small screens */
+    }
+    
+    .button {
+        right: 150px;
+    }
+    
+    .user-panel-container {
+        right: 20px;
+    }
+}
+
+/* Extra small screens - show only icon for login */
+@media (max-width: 480px) {
+    .login-button {
+        padding: 8px;
+        min-width: 45px;
+        justify-content: center;
+    }
+    
+    .button {
+        right: 90px;
     }
 }
