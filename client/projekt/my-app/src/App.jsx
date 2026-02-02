@@ -13,16 +13,18 @@ import SymptomAnalysis from './pages/SymptomAnalysis/SymptomAnalysis.jsx'
 import LoginPanel from './pages/LoginPanel/LoginPanel.jsx'
 import History from './pages/History/History.jsx';
 
-// Protected Route Component
+// Wrapper component to secure routes that require login
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   
+  // Show loading state while checking token
   if (loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
       Loading...
     </div>;
   }
   
+  // Redirect to login if user is not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -30,18 +32,22 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+// Main layout structure with Header, Footer and dynamic content
 function AppContent() {
   return (
     <div className="app-container">
       <Header />
       <main className="content">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<TitlePage />} />
           <Route path="/about" element={<About />} /> 
           <Route path="/database" element={<Database />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/symptom-analysis" element={<SymptomAnalysis />} />
           <Route path="/login" element={<LoginPanel />} />
+          
+          {/* Private Route - accessible only after login */}
           <Route 
             path="/history" 
             element={
@@ -57,6 +63,7 @@ function AppContent() {
   );
 }
 
+// Root component initializing Router and Auth Context
 function App() {
   return (
     <Router>

@@ -1,21 +1,24 @@
-import { useState } from 'react'; // <--- 1. IMPORTUJEMY STATE
+import { useState } from 'react';
 import './DiagnosisResult.css';
+import { Link } from 'react-router-dom';
 
-// 2. DODAJEMY onSave DO PROPSÓW
+// Component for displaying the diagnosis result and providing actionable steps
 export default function DiagnosisResult({ data, onBack, onSave }) {
-    const [isSaved, setIsSaved] = useState(false); // <--- 3. STAN ZAPISU
+    
+    // Tracks if the diagnosis has been saved to the history to prevent duplicates
+    const [isSaved, setIsSaved] = useState(false);
 
-    // Funkcja obsługująca kliknięcie zapisu
+    // Handles the save logic, ensuring raw data exists before calling the API
     const handleSaveClick = async () => {
-        // Sprawdzamy, czy mamy dane do zapisu (te surowe, które dokleiliśmy w SymptomAnalysis)
         if (data.rawPrediction && data.rawSymptoms) {
             await onSave(data.rawPrediction, data.rawSymptoms);
-            setIsSaved(true); // Zmieniamy przycisk na "Zapisano"
+            setIsSaved(true);
         } else {
-            console.error("Brak danych surowych (rawPrediction/rawSymptoms) w obiekcie data");
+            console.error("Missing raw data (rawPrediction/rawSymptoms) in data object");
         }
     };
 
+    // Static data for the recommendation cards displayed on the right
     const diseaseresultBox = [
         {
             icon: <img src="/img/diag_rec.png" alt="Reccomendation icon" />,
@@ -37,11 +40,15 @@ export default function DiagnosisResult({ data, onBack, onSave }) {
     return (
         <div className="result-container">
             <div className="result-card">
-                <h2>Based on the symptoms, your possible diagnosis is...</h2>
+                
+                {/* Close button/Link to home page */}
+                <Link to="/" className="close-btn-x">x</Link>
+                
+                <h2>Based on the symptoms, your possible diagnosis is...</h2>                
                 
                 <div className="disease-content-wrapper" style={{ display: 'flex', flexWrap: 'wrap' }}>
                     
-                    {/* LEWA STRONA (TEKST + PRZYCISKI) */}
+                    {/* Left column: Disease name, description, symptoms, and resources */}
                     <div className="disease-left-side">
                         <div className="disease-name">
                             <h1 className="disease-title">{data.Disease}</h1>
@@ -68,7 +75,7 @@ export default function DiagnosisResult({ data, onBack, onSave }) {
                         </div>                        
                     </div>
 
-                    {/* PRAWA STRONA (KAFELKI) */}
+                    {/* Right column: General medical advice cards */}
                     <div className="disease-right-side">
                         <div className="disease-result-grid">
                             {diseaseresultBox.map((box, index) => (
@@ -85,6 +92,8 @@ export default function DiagnosisResult({ data, onBack, onSave }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Action buttons: Save to History and Start New Diagnosis */}
                 <div className="diagnosis-actions">
                     <button 
                         className={`action-btn btn-save ${isSaved ? 'saved' : ''}`} 
@@ -95,7 +104,7 @@ export default function DiagnosisResult({ data, onBack, onSave }) {
                     </button>
                             
                     <button className="action-btn btn-back" onClick={onBack}>
-                        Back / New Diagnosis
+                        New Diagnosis
                     </button>
                 </div>        
             </div>

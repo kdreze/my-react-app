@@ -3,21 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
+// Global Header component containing navigation and auth status
 export default function Header() {
+  
+  // State for mobile menu visibility
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  // Toggles hamburger menu
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
   };
 
+  // Closes menu on link click (mobile UX)
   const closeMobileMenu = () => {
     if (window.innerWidth <= 768) {
       setIsNavOpen(false);
     }
   };
 
+  // Handles logout sequence
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -26,17 +32,21 @@ export default function Header() {
 
   return (
     <header className="header">
+      {/* Logo Section */}
       <Link to="/">
         <img className="nav-logo" src="/img/logo_no_background.png" alt="Main logo"/>
       </Link>
+      
+      {/* Hamburger Icon (Mobile) */}
       <div className='button' onClick={toggleNav}>
         <span className='bar'></span>
         <span className='bar'></span>
         <span className='bar'></span>
       </div>
       
-      {/* User Panel Section */}
+      {/* User Status Section */}
       <div className='user-panel-container'>
+        {/* Show Profile if logged in, otherwise Login button */}
         {isAuthenticated ? (
           <div className="user-panel">
             <div className="user-avatar">
@@ -58,6 +68,7 @@ export default function Header() {
         )}
       </div>
 
+      {/* Main Navigation Links */}
       <nav>
         <ul className={`nav-list ${isNavOpen ? "active" : ""}`}>
           <li className="nav-list-item"><Link to="/about" onClick={closeMobileMenu}>About</Link></li>

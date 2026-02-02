@@ -3,31 +3,37 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+// Main component for the Login/Register page
 export default function LoginPanel() {
+    
+    // State for the sliding animation (switches between Login and Register)
     const [isRightPanelActive, setIsRightPanelActive] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { login, register } = useAuth();
     
-    // Sign In State
+    // Sign In inputs
     const [signInEmail, setSignInEmail] = useState('');
     const [signInPassword, setSignInPassword] = useState('');
     
-    // Sign Up State
+    // Sign Up inputs
     const [signUpName, setSignUpName] = useState('');
     const [signUpEmail, setSignUpEmail] = useState('');
     const [signUpPassword, setSignUpPassword] = useState('');
     const [signUpPasswordRepeat, setSignUpPasswordRepeat] = useState('');
 
+    // Handle Login form submission
     const handleSignIn = async (e) => {
         e.preventDefault();
         setError('');
         
+        // Basic validation
         if (!signInEmail || !signInPassword) {
             setError('Please fill in all fields');
             return;
         }
         
+        // Attempt to login
         const result = await login(signInEmail, signInPassword);
         
         if (result.success) {
@@ -37,25 +43,30 @@ export default function LoginPanel() {
         }
     };
 
+    // Handle Register form submission
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError('');
         
+        // Validate empty fields
         if (!signUpName || !signUpEmail || !signUpPassword || !signUpPasswordRepeat) {
             setError('Please fill in all fields');
             return;
         }
         
+        // Validate passwords match
         if (signUpPassword !== signUpPasswordRepeat) {
             setError('Passwords do not match');
             return;
         }
         
+        // Validate password length
         if (signUpPassword.length < 6) {
             setError('Password must be at least 6 characters');
             return;
         }
         
+        // Attempt to register
         const result = await register(signUpName, signUpEmail, signUpPassword);
         
         if (result.success) {
@@ -67,11 +78,13 @@ export default function LoginPanel() {
 
     return (
         <main className="login-panel">
+            {/* Main container with dynamic class for sliding animation */}
             <div className={`login-panel-container ${isRightPanelActive ? "right-panel-active" : ""}`}>
                 <Link to="/">
                     <button className="close-button">x</button>
                 </Link>
                 
+                {/* Error message popup */}
                 {error && (
                     <div style={{
                         position: 'absolute',
@@ -89,6 +102,7 @@ export default function LoginPanel() {
                     </div>
                 )}
                 
+                {/* Sign In Form Section */}
                 <div className="sign-in-container">
                     <div className="sign-in-form-wrapper">
                         <form onSubmit={handleSignIn}>
@@ -114,6 +128,7 @@ export default function LoginPanel() {
                     </div>
                 </div>
                 
+                {/* Sign Up Form Section */}
                 <div className="sign-up-container">
                     <div className="sign-up-form-wrapper">
                         <form onSubmit={handleSignUp}>
@@ -155,8 +170,11 @@ export default function LoginPanel() {
                     </div>
                 </div>
                 
+                {/* Overlay Section (The sliding part) */}
                 <div className="overlay-container">
                     <div className="overlay">
+                        
+                        {/* Left Overlay - Visible when Sign Up is active */}
                         <div className="overlay-panel-left overlay-left">
                             <p className="overlay-small-text-left">Already have an account?</p>
                             <h1>Welcome back!</h1>
@@ -166,13 +184,15 @@ export default function LoginPanel() {
                             <button 
                                 className="secondary-button-left" 
                                 onClick={() => {
-                                    setIsRightPanelActive(false);
+                                    setIsRightPanelActive(false); // Go to Sign In
                                     setError('');
                                 }}
                             >
                                 SIGN IN
                             </button>
                         </div>
+
+                        {/* Right Overlay - Visible when Sign In is active */}
                         <div className="overlay-panel-right overlay-right">
                             <p className="overlay-small-text-right">New to Sympthosium?</p>
                             <h1>Register now!</h1>
@@ -182,7 +202,7 @@ export default function LoginPanel() {
                             <button 
                                 className="secondary-button-right" 
                                 onClick={() => {
-                                    setIsRightPanelActive(true);
+                                    setIsRightPanelActive(true); // Go to Sign Up
                                     setError('');
                                 }}
                             >

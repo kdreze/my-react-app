@@ -2,16 +2,21 @@ import { useState, useEffect } from 'react';
 import './History.css';
 import { useAuth } from '../../context/AuthContext';
 
+// Component responsible for displaying and managing diagnosis history
 const History = () => {
+    
+    // State for storing the list of diagnoses and handling inline editing
     const [history, setHistory] = useState([]);
     const [editId, setEditId] = useState(null);
     const [editNote, setEditNote] = useState("");
     const { token } = useAuth();
 
+    // Fetch history data when the component mounts
     useEffect(() => {
         fetchHistory();
     }, []);
 
+    // READ: Fetches the list of past diagnoses from the backend
     const fetchHistory = async () => {
         try {
             const res = await fetch('http://localhost:8000/history', {
@@ -26,6 +31,7 @@ const History = () => {
         }
     };
 
+    // DELETE: Removes a specific entry after confirmation
     const handleDelete = async (id) => {
         if(!window.confirm("Are you sure you want to delete this entry?")) return;
         try {
@@ -35,17 +41,19 @@ const History = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            fetchHistory();
+            fetchHistory(); // Refresh list after deletion
         } catch (err) {
             console.error("Deletion error:", err);
         }
     };
 
+    // Prepares the state for inline editing
     const startEdit = (item) => {
         setEditId(item.id);
         setEditNote(item.note);
     };
 
+    // UPDATE: Saves the modified note to the database
     const saveEdit = async (id) => {
         try {
             await fetch(`http://localhost:8000/history/${id}`, {
@@ -56,13 +64,14 @@ const History = () => {
                 },
                 body: JSON.stringify({ note: editNote })
             });
-            setEditId(null);
-            fetchHistory();
+            setEditId(null); // Exit edit mode
+            fetchHistory();  // Refresh list
         } catch (err) {
             console.error("Edition error:", err);
         }
     };
 
+    // UPDATE: Toggles the confirmation status checkbox
     const toggleConfirmed = async (item) => {
         try {
             await fetch(`http://localhost:8000/history/${item.id}`, {
@@ -83,6 +92,7 @@ const History = () => {
         <div className="history-container">
             <h1 className="history-title">Diagnose history</h1>
             
+            {/* Conditional rendering: Show message if empty, otherwise show table */}
             {history.length === 0 ? (
                 <p className="no-history-message">No saved diagnoses.</p>
             ) : (
@@ -101,6 +111,8 @@ const History = () => {
                             <tr key={item.id}>
                                 <td className="fw-bold">{item.disease}</td>
                                 <td className="text-center date-cell">{item.date || "-"}</td>
+                                
+                                {/* Status Checkbox */}
                                 <td className="text-center">
                                     <input 
                                         type="checkbox" 
@@ -109,6 +121,8 @@ const History = () => {
                                         onChange={() => toggleConfirmed(item)}
                                     />
                                 </td>
+                                
+                                {/* Editable Note Field */}
                                 <td>
                                     {editId === item.id ? (
                                         <input 
@@ -122,6 +136,8 @@ const History = () => {
                                         <span className="note-text">{item.note || "Add note..."}</span>
                                     )}
                                 </td>
+
+                                {/* Action Buttons */}
                                 <td className="action-cell">
                                     {editId === item.id ? (
                                         <button className="action-btn btn-save" onClick={() => saveEdit(item.id)}>

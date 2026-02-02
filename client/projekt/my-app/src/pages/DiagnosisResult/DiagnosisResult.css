@@ -28,8 +28,7 @@
 }
 
 /* Close Button */
-.result-card::after {
-    content: '×';
+.close-btn-x {
     position: absolute;
     top: 25px;
     right: 30px;
@@ -43,9 +42,11 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    z-index: 100; /* Ważne: żeby był "nad" wszystkim innym */
+    user-select: none; /* Żeby nie zaznaczać tekstu przy klikaniu */
 }
 
-.result-card::after:hover {
+.close-btn-x:hover {
     color: #000;
     transform: scale(1.1);
 }

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import DiagnosisResult from "../DiagnosisResult/DiagnosisResult";
 import database from "../../data/data.json";
 
+// List of symptoms used for the dropdown and ML model input
 const symptomsList = [
   "Fever", "Cough", "Fatigue", "Headache", "Nausea", "Vomiting", "Diarrhea",
   "Abdominal pain", "Chest pain", "Shortness of breath", "Dizziness", "Rash",
@@ -18,12 +19,18 @@ const symptomsList = [
   "Neck stiffness", "Dark urine",
 ];
 
+// Main component for symptom selection and diagnosis
 export default function SymptomAnalysis() {
+  // UI state for dropdown visibility
   const [isOpen, setIsOpen] = useState(false);
+  // Tracks user selection
   const [selectedSymptoms, setSelectedSymptoms] = useState({});
+  // Stores the result data (switches view when not null)
   const [diagnosisData, setDiagnosisData] = useState(null);
+  // Auth context for API requests
   const { token, isAuthenticated } = useAuth();
 
+  // Saves the current diagnosis to the user's history (requires login)
   const saveToHistory = async (disease, symptomsArray) => {
     if (!isAuthenticated) {
       alert("Please log in to save diagnosis to history");
@@ -31,6 +38,7 @@ export default function SymptomAnalysis() {
     }
     
     try {
+      // API Call to save entry
       await fetch("http://localhost:8000/history", {
         method: "POST",
         headers: { 
@@ -50,6 +58,7 @@ export default function SymptomAnalysis() {
     }
   };
 
+  // Toggles symptom selection state
   const handleCheckboxChange = (symptom) => {
     setSelectedSymptoms((prev) => ({
       ...prev,
@@ -57,21 +66,25 @@ export default function SymptomAnalysis() {
     }));
   };
 
+  // Core function: validates input, calls ML API, and matches with database
   const handleDiagnose = async () => {
     const count = Object.values(selectedSymptoms).filter(
       (val) => val === true
     ).length;
     
+    // Validation: Minimum 4 symptoms
     if (count < 4) {
       alert("Please select at least 4 symptoms to proceed with diagnosis.");
       return;
     }
 
+    // Convert selection to binary format for the AI model
     const numbersArray = symptomsList.map((symptom) =>
       selectedSymptoms[symptom] ? 1 : 0
     );
 
     try {
+      // API Call to ML service
       const response = await fetch("http://localhost:8000/symptoms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,12 +96,14 @@ export default function SymptomAnalysis() {
       const data = await response.json();
       const backendPrediction = data.predicted_disease;
 
+      // Find detailed info in local database
       const foundDisease = database.find(
         (item) =>
           item.Disease?.trim().toLowerCase() ===
           backendPrediction?.trim().toLowerCase()
       );
 
+      // Prepare result object (with fallback if not found)
       const resultData = foundDisease ? { ...foundDisease } : {
           Disease: backendPrediction || "Unknown",
           Description: "No matching disease found in the database.",
@@ -112,6 +127,7 @@ export default function SymptomAnalysis() {
     setIsOpen(false);
   };
 
+  // Conditional rendering: Show Result component if diagnosis exists
   if (diagnosisData) {
     return (
       <DiagnosisResult 
@@ -123,6 +139,7 @@ export default function SymptomAnalysis() {
     );
   }
 
+  // Default View: Symptom Selection Form
   return (
     <main className="symptoms-page">
       <div className="symptoms-page-container">
